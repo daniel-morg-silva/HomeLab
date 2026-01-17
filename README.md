@@ -15,5 +15,11 @@ My journal for my homelab journey.
 - Set up a PostgreSQL database inside the cluster. 
 - Created a venv Virtual Environment for the python script to ensure portability and reduce compatibility issues.
 - Created the required tables for the Whoop data in the database.
+- Successully deployed the PGAdmin service and added the PostgreSQL database.
+
+## 18 Jan
+- Continue the Python Script for Whoop data Retrieval.
+- Containerise the script.
+- Deploy it into the cluster.
 
 ## Problems Faced
