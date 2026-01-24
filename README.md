@@ -22,4 +22,6 @@ My journal for my homelab journey.
 - Containerise the script.
 - Deploy it into the cluster.
 
+## 20 Jan
+- Managed to get the profile details into the the database
 ## Problems Faced
