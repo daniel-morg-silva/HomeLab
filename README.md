@@ -103,6 +103,22 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 *   [Kubernetes Ingress Tutorial for Beginners | simply explained | Kubernetes Tutorial 22](https://www.youtube.com/watch?v=80Ew_fsV4rM)
 *   [Kubernetes Networking Explained](https://www.youtube.com/watch?v=J8jAzqbXxjE)
 
+### 🗓️ [10 February 2026 - Set Up METALLB & NGINX Ingress Controller]
+**Accomplishment:** Implemented a load balancing and ingress layer, exposing the IP of the NGINX Ingress Controller via MetalLB, acting as the proxy to applications in the cluster.*   
+*   Deployed MetalLB Load Balancer: Installed the `metallb` Helm chart into the dedicated `metallb-system` namespace. Configured an `IPAddressPool` to assign external IP addresses from the local network range (eg. `192.168.8.200-192.168.8.220`). This provides the crucial ability for services to obtain routable IPs, a feature native to cloud Kubernetes environments.
+*   Installed NGINX Ingress Controller: Deployed the `ingress-nginx` controller via Helm into its own namespace. Configured its service as type `LoadBalancer`, which successfully received the external IP from MetalLB. This controller now acts as the central, smart router for all HTTP/HTTPS traffic entering the cluster.
+*   Validated the Complete Pipeline: Created a test application and exposed it with a Service. Defined a Kubernetes `Ingress` resource with a routing rule, successfully accessing the application from outside the cluster at `http://192.168.8.100`. This validated the full traffic path: Client -> MetalLB IP -> NGINX Ingress -> Application Service -> Application Pod.
+
+
+**Key Learning:** Successfully decoupled network layers, using MetalLB to provide stable external IPs (Network Layers) and NGINX Ingress to intelligently route HTTP traffic (Application Layer) based on host and path rules, mirroring production Kubernetes architecture.
+
+**Resources Utilised:**
+*   [Metallb vs Nginx](https://softstrix.com/metallb-vs-nginx/)
+*   [NGINX Ingress Controller Documentation](https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/basic-configuration/)
+*   [MetalLB Documentation](https://metallb.io/configuration/)
+*   [Step 4: Install MetalLB on K3s Cluster | Load Balancer Setup for Bare-Metal Kubernetes](https://www.youtube.com/watch?v=uDBpPI_tz4Q)
+*   [NGINX Explained - What is Nginx](https://www.youtube.com/watch?v=iInUBOVeBCc)
+
 ---
 
 ## 🚀 Next Objectives
