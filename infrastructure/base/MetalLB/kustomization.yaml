@@ -1,5 +1,4 @@
 resources:
   - helmrepository.yaml
   - helmrelease.yaml
-  - address-pool.yaml
-  - l2-advertisement.yaml
+  - metallb-config.yaml
