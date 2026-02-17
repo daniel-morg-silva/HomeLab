@@ -17,4 +17,5 @@ spec:
         kind: HelmRepository
         name: nginx-ingress
   releaseName: nginx-ingress
+  targetNamespace: nginx-ingress
   interval: 1h  # interval for drifting checker
