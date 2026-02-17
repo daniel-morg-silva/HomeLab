@@ -17,4 +17,5 @@ spec:
         name: nginx-ingress
       interval: 24h # interval for checking a new chart
   interval: 1h # interval for checking drifting
+  targetNamespace: nginx-ingress
   releaseName: nginx
