@@ -11,10 +11,10 @@ spec:
   chart:
     spec:
       chart: nginx-ingress
-      version: 2.4.x
+      version: 5.3.x
+      interval: 24h # interval for checking a new chart
       sourceRef:
         kind: HelmRepository
         name: nginx-ingress
-      interval: 24h # interval for checking a new chart
   interval: 1h # interval for checking drifting
-  releaseName: nginx
+  releaseName: nginx-ingress
