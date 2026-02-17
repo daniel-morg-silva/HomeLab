@@ -1,4 +1,4 @@
-# HomeLab - Evolution from Virtual to Physical
+# HomeLab
 
 Welcome to my homelab journal, chronicling the process of building a kubernetes cluster from scratch as a total beginner.
 
