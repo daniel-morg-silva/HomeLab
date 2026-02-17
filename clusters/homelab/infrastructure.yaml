@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./infrastructure/base/controllers/metallb
+  path: ./infrastructure/controllers/metallb
   prune: true
   wait: true
   sourceRef:
