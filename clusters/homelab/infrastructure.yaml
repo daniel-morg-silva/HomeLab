@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infrastructure-controllers
+  name: metallb-controllers
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./infrastructure/homelab/controllers
+  path: ./infrastructure/base/controllers/metallb
   prune: true
   wait: true
   sourceRef:
@@ -21,9 +21,28 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure-controllers
+    - name: metallb-controllers
   interval: 10m0s
-  path: ./infrastructure/homelab/config
+  path: ./infrastructure/config/homelab
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+---
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nginx-ingress
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: metallb-controllers
+    - name: infrastructure-config
+  interval: 10m0s
+  path: ./infrastructure/controllers/nginx
   prune: true
   sourceRef:
     kind: GitRepository
