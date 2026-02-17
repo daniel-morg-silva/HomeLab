@@ -153,6 +153,13 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 *   Recreated nginx deployment with 3 replicas, all managed through Git.
 *   Exposed via ClusterIP service and Ingress resource with proper routing.
 *   Verified external access at `mynginx.net`, confirming the GitOps pipeline works.
+
+**Resources Utilised:**
+*   [ The GitOps Way to Run Your Kubernetes Homelab in 2025 ](https://www.youtube.com/watch?v=FcBs2iwXC-U)
+*   [Advanced K8S with FluxCD](https://www.youtube.com/playlist?list=PLINxtbqxrBCu9Y-r_ZBMqYW8uHeQhLW9P)
+*   [Flux Documentation](https://fluxcd.io/flux/)
+*   [flux2-kustomize-helm-example (Repo)](https://github.com/fluxcd/flux2-kustomize-helm-example)
+
 ---
 
 ## 🚀 Next Objectives
