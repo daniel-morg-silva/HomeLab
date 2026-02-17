@@ -1,0 +1,8 @@
+#
+#     create namespace for nginx
+#
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-ingress
