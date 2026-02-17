@@ -119,6 +119,40 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 *   [Step 4: Install MetalLB on K3s Cluster | Load Balancer Setup for Bare-Metal Kubernetes](https://www.youtube.com/watch?v=uDBpPI_tz4Q)
 *   [NGINX Explained - What is Nginx](https://www.youtube.com/watch?v=iInUBOVeBCc)
 
+### 🗓️ [17 February 2026 - GitOps Transformation with Flux]
+
+**Accomplishment:** Set up Flux CD (GitOps), establishing a declarative and version-controlled infrastructure management system.
+
+**Key Technology Additions:**
+*   **GitOps Tool:** Flux CD v2
+*   **Infrastructure as Code:** Git repository as single source of truth
+*   **Helm Integration:** Flux HelmController for declarative Helm releases
+
+#### 🧹 Clean Slate & Reinstallation
+*   Performed a complete cluster reset on both nodes using the K3s uninstall script.
+*   Executed a fresh K3s installation with the `--disable=traefik` and `--disable servicelb` flags to prevent the default ingress controller and load balancer.
+
+#### 🔄 GitOps Foundation with Flux
+*   Bootstrapped Flux CD into the cluster, establishing a sync loop between Git and the live cluster state.
+*   Organized manifests into logical paths for controllers, configurations, and applications.
+
+#### 🏗️ Infrastructure Controllers (The GitOps Way)
+*   **MetalLB:** Deployed via HelmRelease in Git, version `0.15.3`, into `metallb-system` namespace.
+*   **IP Pool:** Configured `IPAddressPool` and `L2Advertisement` in Git for range `192.168.8.100-192.168.8.140`.
+*   **NGINX Ingress:** Added Helm chart with dependency on MetalLB and its config.
+
+#### 🔗 Solving the Dependency Challenge
+*   **The Problem:** NGINX would hang waiting for a LoadBalancer IP while MetalLB was still deploying.
+*   **The Solution:** Restructured Kustomizations into a proper dependency chain:
+    ```yaml
+    metallb-controllers → infrastructure-config → nginx-ingress
+    ```
+*   **The Result:** Each component now waits for prerequisites before deploying.
+
+#### 🚀 Application Deployment
+*   Recreated nginx deployment with 3 replicas, all managed through Git.
+*   Exposed via ClusterIP service and Ingress resource with proper routing.
+*   Verified external access at `mynginx.net`, confirming the GitOps pipeline works.
 ---
 
 ## 🚀 Next Objectives
