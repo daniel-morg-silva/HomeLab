@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-#  - host: mynginx123.com
+  - host: 192.168.8.100
   - http:
       paths:
       - path: /
