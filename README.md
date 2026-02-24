@@ -160,6 +160,34 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 *   [Flux Documentation](https://fluxcd.io/flux/)
 *   [flux2-kustomize-helm-example (Repo)](https://github.com/fluxcd/flux2-kustomize-helm-example)
 
+### 🗓️ [24 February 2026 - GitOps Database Management with CloudNativePG]
+
+**Accomplishment:** Set up CloudNativePG operator to manage PostgreSQL databases in a GitOps fashion, replacing the initial manual StatefulSet approach.
+
+**Key Technology Additions:**
+*   **Database Operator:** CloudNativePG
+*   **Secret Management:** SOPS with age encryption (prepared for future use)
+
+---
+
+#### 🗄️ Database Strategy Pivot
+*   Initially planned to deploy PostgreSQL manually via StatefulSet with SOPS-encrypted secrets.
+*   After research, pivoted to **CloudNativePG operator** for automated database lifecycle management (backups, failover, scaling).
+*   The operator handles what would have required multiple manual YAML files and scripts.
+
+#### 🔐 Secret Management Foundation
+*   Generated age encryption key pair and stored the private key in the cluster for future SOPS integration.
+*   Created `.sops.yaml` configuration to enable secure secret storage in Git when needed.
+
+#### 🚀 Operator Installation
+*   Deployed CloudNativePG via HelmRelease in the `cnpg-system` namespace.
+*   Verified Custom Resource Definitions (CRDs) were installed, enabling declarative database clusters.
+
+**Key Learning:** CloudNativePG turns PostgreSQL into a true cloud-native citizen, handling operations that would otherwise require significant manual effort.
+
+**Resources Utilised:**
+*   [ CloudNativePG: Kubernetes Databases Made Simple (Full Course) ](https://www.youtube.com/watch?v=g59ki9z2SO8&t=201s)
+*   [CloudNativePG Documentation](https://cloudnative-pg.io/docs/1.28/installation_upgrade)
 ---
 
 ## 🚀 Next Objectives
