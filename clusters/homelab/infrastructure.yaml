@@ -1,6 +1,22 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: infrastructure-controllers
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./infrastructure/controllers/
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+---
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: metallb-controllers
   namespace: flux-system
 spec:
@@ -35,7 +51,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: nginx-ingress
+  name: nginx-ingress-controllers
   namespace: flux-system
 spec:
   dependsOn:
