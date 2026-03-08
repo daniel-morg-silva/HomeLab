@@ -9,7 +9,14 @@ spec:
       containers:
       - name: init-db
         image: ghcr.io/mischavandenburg/whoop-scraper:latest
-        args: ["init-db"]
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Install the package first
+          pip install whoop-scraper
+          # Then run the command
+          whoop-scraper init-db
         env:
         - name: WHOOP_DB_HOST
           valueFrom:
