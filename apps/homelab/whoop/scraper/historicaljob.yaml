@@ -22,16 +22,6 @@ spec:
             secretKeyRef:
               name: whoop-secrets
               key: client-secret
-        - name: WHOOP_ACCESS_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: whoop-secrets
-              key: access-token
-        - name: WHOOP_REFRESH_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: whoop-secrets
-              key: refresh-token
         - name: WHOOP_DB_HOST
           valueFrom:
             configMapKeyRef:
