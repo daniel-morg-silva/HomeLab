@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: whoop
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-db
+        image: ghcr.io/mischavandenburg/whoop-scraper:latest
+        args: ["init-db"]
+        env:
+        - name: WHOOP_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: whoop-config
+              key: WHOOP_DB_HOST
+        - name: WHOOP_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: whoop-cluster-app
+              key: password
+      restartPolicy: Never
+  backoffLimit: 3

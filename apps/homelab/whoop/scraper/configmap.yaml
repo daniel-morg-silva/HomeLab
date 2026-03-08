@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whoop-config
+  namespace: whoop
+data:
+  WHOOP_SCRAPE_DAYS: "7"
+  WHOOP_DB_HOST: "whoop-cluster-rw.whoop.svc.cluster.local"
+  WHOOP_DB_PORT: "5432"
+  WHOOP_DB_NAME: "whoop-db"
+  WHOOP_DB_USER: "app"
