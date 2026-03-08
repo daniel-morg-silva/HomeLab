@@ -8,4 +8,3 @@ spec:
   owner: app
   cluster:
     name: whoop-cluster
-    namespace: whoop
