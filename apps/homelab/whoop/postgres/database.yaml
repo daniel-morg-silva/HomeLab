@@ -2,8 +2,10 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: whoop-db
+  namespace: whoop
 spec:
   name: whoop
   owner: app
   cluster:
     name: whoop-cluster
+    namespace: whoop
