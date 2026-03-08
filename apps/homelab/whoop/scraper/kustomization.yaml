@@ -2,3 +2,4 @@ resources:
   - configmap.yaml
   - secrets.yaml
   - initjob.yaml
+  - cronjob.yaml

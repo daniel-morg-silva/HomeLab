@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: whoop-scraper
+  namespace: whoop
+spec:
+  schedule: "0 6 * * *" # Daily at 6 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: scraper
+            image: ghcr.io/mischavandenburg/whoop-scraper:v0.0.5
+            command: ["/app/.venv/bin/whoop-scraper"]
+            args: ["scrape", "--days", "7"]
+            env:
+            - name: WHOOP_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: whoop-secrets
+                  key: client-id
+            - name: WHOOP_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: whoop-secrets
+                  key: client-secret
+            - name: WHOOP_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: whoop-config
+                  key: WHOOP_DB_HOST
+            - name: WHOOP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: whoop-cluster-app
+                  key: password
+          restartPolicy: OnFailure
