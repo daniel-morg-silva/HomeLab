@@ -1,7 +1,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: whoop
+  name: whoop-cluster
   namespace: whoop
 spec:
   instances: 3

@@ -1,0 +1,9 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: whoop-db
+spec:
+  name: whoop
+  owner: app
+  cluster:
+    name: whoop-cluster
