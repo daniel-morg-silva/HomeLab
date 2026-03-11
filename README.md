@@ -15,7 +15,7 @@ This initial phase was focused on learning basic networking and kubernetes conce
 
 ---
 
-### 🗓️ 13 January 2025
+### 🗓️ 13 January 2026
 **Accomplishment:** Established the virtual network infrastructure.
 *   Created a dedicated virtual network bridge to enable communication between virtual machines.
 *   Provisioned two Ubuntu Server virtual machines, designated for the Kubernetes control plane and worker node roles.
@@ -24,7 +24,7 @@ This initial phase was focused on learning basic networking and kubernetes conce
 *   [KVM Host Network Configurations using Virt-Manager](https://cloudspinx.com/kvm-host-network-configurations-using-virt-manager/)
 *   [Virtual Machine Manager Documentation](https://virt-manager.org/screenshots.html)
 
-### 🗓️ 15 January 2025
+### 🗓️ 15 January 2026
 **Accomplishment:** Successfully deployed a functional K3s Kubernetes cluster.
 *   Initialized a master node.
 *   Joined a worker node to the cluster, enabling distributed workload execution.
@@ -34,7 +34,7 @@ This initial phase was focused on learning basic networking and kubernetes conce
 *   [K3s Quick-Start Guide](https://docs.k3s.io/quick-start)
 *   [Kubernetes `kubectl` Command Reference](https://kubernetes.io/docs/reference/kubectl/)
 
-### 🗓️ 16 January 2025
+### 🗓️ 16 January 2026
 **Accomplishment:** Initiated the "Whoop Project" for health data integration.
 *   Registered an application with the Whoop API to obtain OAuth 2.0 client credentials.
 *   Developed the initial Python script to handle authentication and establish a connection to the Whoop API, retrieving an access token.
@@ -43,7 +43,7 @@ This initial phase was focused on learning basic networking and kubernetes conce
 *   [Whoop API Documentation](https://developer.whoop.com/api)
 *   [Python `whoopy` Library](https://github.com/felixnext/whoopy)
 
-### 🗓️ 17 January 2025
+### 🗓️ 17 January 2026
 **Accomplishment:** Built the persistent data layer and management interface for the project.
 *   Deployed a PostgreSQL database as a StatefulSet within the K3s cluster to ensure data persistence.
 *   Created a dedicated Python virtual environment (`venv`) to manage project dependencies cleanly.
@@ -54,7 +54,7 @@ This initial phase was focused on learning basic networking and kubernetes conce
 *   [PostgreSQL Kubernetes Deployment](https://www.digitalocean.com/community/tutorials/how-to-deploy-postgres-to-kubernetes-cluster)
 *   [PgAdmin4 Official Site](https://www.pgadmin.org/)
 
-### 🗓️ 18 January 2025
+### 🗓️ 18 January 2026
 **Accomplishment:** Advanced the data pipeline towards containerization.
 *   Enhanced the Python script to retrieve specific data sets (e.g., sleep cycles, workout summaries) from the Whoop API.
 *   Created a `Dockerfile` to package the script, its virtual environment, and all dependencies into a portable container image.
