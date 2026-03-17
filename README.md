@@ -219,7 +219,5 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 
 ## 🚀 Next Objectives
 
-1.  Migrate the Whoop Project (PostgreSQL, CronJob, PgAdmin) from the old virtual cluster to the new bare-metal cluster.
-2.  Configure persistent storage for the database using a local path provisioner or Longhorn.
-3.  Explore implementing TLS certificates for secure (HTTPS) access to services via Ingress.
-4.  Set up centralized cluster monitoring with Prometheus and Grafana.
+1.  Set up centralized cluster monitoring with Prometheus and Grafana.
+2.  Explore implementing TLS certificates for secure (HTTPS) access to services via Ingress.
