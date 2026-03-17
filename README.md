@@ -2,7 +2,7 @@
 
 Welcome to my homelab journal, chronicling the process of building a kubernetes cluster from scratch as a total beginner.
 
-## 📅 Phase 1: Virtual Foundations (January 2025)
+## 📅 Phase 1: Virtual Foundations (January 2026)
 
 This initial phase was focused on learning basic networking and kubernetes concepts. This phase I was heavily guided with AI, hence the somewhat fast progress.
 
@@ -189,6 +189,33 @@ In this phase my goal is to take what I have learned in phase 1, and apply it in
 *   [ CloudNativePG: Kubernetes Databases Made Simple (Full Course) ](https://www.youtube.com/watch?v=g59ki9z2SO8&t=201s)
 *   [CloudNativePG Documentation](https://cloudnative-pg.io/docs/1.28/installation_upgrade)
 ---
+
+### 🗓️ [8-17 March 2026 - Whoop Data Pipeline Complete!]
+
+**Accomplishment:** Successfully deployed and backfilled a complete Whoop data pipeline with PostgreSQL, CloudNativePG, and automated daily scraping.
+
+**Key Achievements:**
+*   **Database Infrastructure:** CloudNativePG cluster with 3 nodes, auto-generated secrets, and high availability
+*   **Secret Management:** SOPS-encrypted Whoop API credentials with age key, plus auto-generated database passwords
+*   **Historical Backfill:** Scraped 2 years of Whoop data (June 2024 - March 2026) using parallel Kubernetes Jobs
+*   **Data Volume:** ~3,500+ total records across sleep, workouts, cycles, and recovery metrics
+*   **Automation:** Daily cronjob scheduled for 6 AM to keep data current
+
+#### 🐛 Troubleshooting Journey
+*   **Token Management:** Overcame 401 errors by understanding OAuth token expiration and database token storage
+*   **Rate Limiting:** Implemented monthly batching to respect Whoop API limits (429 errors)
+*   **Path Discovery:** Found correct executable at `/app/.venv/bin/whoop-scraper` inside the container
+*   **Job Immutability:** Learned to delete and recreate Jobs instead of updating them
+
+**Key Learning:** Building a complete data pipeline from scratch taught me about API authentication, database operations, Kubernetes Jobs, rate limiting, and GitOps practices—all working together seamlessly.
+
+**Resources Utilised:**
+*   [CloudNativePG Documentation](https://cloudnative-pg.io/docs/1.28/)
+*   [Whoop API Developer Portal](https://developer.whoop.com/api)
+*   [Kubernetes Jobs Documentation](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
+*   [Kubernetes CronJobs Documentation](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
+*   [Whoop Scraper Application](https://github.com/mischavandenburg/whoop-scraper)
+
 
 ## 🚀 Next Objectives
 
