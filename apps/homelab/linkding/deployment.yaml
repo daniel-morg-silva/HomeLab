@@ -25,6 +25,6 @@ spec:
           value: "admin"
         - name: LD_SUPERUSER_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              name: whoop-secret
+            secretKeyRef:
+              name: linkding-secret
               key: password
