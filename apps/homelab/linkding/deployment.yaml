@@ -28,3 +28,5 @@ spec:
             secretKeyRef:
               name: linkding-secret
               key: password
+        - name: LD_CONTEXT_PATH
+          value: "/linkding"
