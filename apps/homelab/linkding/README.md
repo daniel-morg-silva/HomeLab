@@ -31,11 +31,6 @@ annotations:
 
 ## Problems Solved During Setup
 
-**Namespace not appearing:** The namespace resource was correct, but the commit hadn't been pushed to GitHub. Flux pulls from the remote repo, not the local working directory.
-
-**Wrong secret reference type:** `LD_SUPERUSER_PASSWORD` was initially referencing the secret via `configMapKeyRef` instead of `secretKeyRef`. Secrets and ConfigMaps use different reference types even though the syntax looks similar.
-
-**Wrong namespace on secret:** `secrets.yaml` was initially set to `namespace: whoop` instead of `namespace: linkding`. Kubernetes secrets are namespace-scoped — a pod in `linkding` cannot reference a secret in `whoop`.
 
 **Ingress rejected across namespaces:** The NGINX Inc controller (unlike the community ingress-nginx) does not merge Ingress resources across namespaces for the same host. Creating a separate Ingress in `linkding` with `host: danielmorgsilva.net` caused the error `host is taken by another resource`. Fixed by using Mergeable Ingresses (master/minion pattern).
 
