@@ -284,6 +284,9 @@ Then forced a pod restart so the superuser was recreated with the correct decryp
 ```bash
 kubectl rollout restart deployment/linkding -n linkding
 ```
+**Resources:**
+- [Mergeable Ingress Types Support](https://github.com/nginx/kubernetes-ingress/tree/v5.4.0/examples/ingress-resources/mergeable-ingress-types)
+- [Cross-namespace configuration](https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/cross-namespace-configuration/)
 
 ---
 
