@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkding
+  namespace: linkding
+  labels:
+    app: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+    template:
+      metadata:
+        labels:
+          app: linkding
+      spec:
+        containers:
+        - name: linkding
+          image: sissbruecker/linkding:latest
+          ports:
+          - containerPort: 9090
+          env:
+          - name: LD_SUPERUSER_NAME
+            value: "admin"
+          - name: LD_SUPERUSER_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: whoop-secret
+                key: password
