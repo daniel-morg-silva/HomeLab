@@ -3,4 +3,3 @@ resources:
   - secrets.yaml
   - initjob.yaml
   - cronjob.yaml
-  - historicaljob.yaml
