@@ -32,8 +32,8 @@ spec:
           value: "linkding"
         volumeMounts:
           - name: linkding
-            mountPath: /etc/linkding/data
+            mountPath: /etc/linkding/data # mounts the volume at /etc/linkding/data inside the container
       volumes:
         - name: linkding
           persistentVolumeClaim:
-            claimName: linkding
+            claimName: linkding # this creates a volume for the PVC. The name matches the volumeMounts.name above.
