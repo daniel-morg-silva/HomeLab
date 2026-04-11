@@ -3,15 +3,13 @@ kind: Ingress
 metadata:
   name: linkding-ingress
   namespace: linkding    
-  annotations:
-    nginx.org/mergeable-ingress-type: "minion"
 spec:
   ingressClassName: nginx
   rules:
-  - host: danielmorgsilva.net
+  - host: linkding.danielmorgsilva.net
     http:
       paths:
-      - path: /linkding
+      - path: /
         pathType: Prefix
         backend:
           service:
