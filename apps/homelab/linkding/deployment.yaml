@@ -28,8 +28,6 @@ spec:
             secretKeyRef:
               name: linkding-secret
               key: password
-        - name: LD_CONTEXT_PATH
-          value: "linkding"
         volumeMounts:
           - name: linkding
             mountPath: /etc/linkding/data # mounts the volume at /etc/linkding/data inside the container
