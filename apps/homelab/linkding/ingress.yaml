@@ -2,16 +2,18 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: linkding-ingress
-  namespace: linkding    
+  namespace: linkding
+  annotations:
+    nginx.org/redirect-to-https: "true"
 spec:
   ingressClassName: nginx
   
-  #tls:
-  #- hosts:
-  #    - linkding.danielmorgsilva.dev
-  #  secretName: danielmorgsilva-dev-secret
+  tls:
+  - hosts:
+      - linkding.danielmorgsilva.dev
+    secretName: danielmorgsilva-dev-secret
   rules:
-  - host: linkding.danielmorgsilva.net
+  - host: linkding.danielmorgsilva.dev
     http:
       paths:
       - path: /
