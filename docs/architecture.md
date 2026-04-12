@@ -5,7 +5,7 @@
 | Role | Machine | Notes |
 |------|---------|-------|
 | Master / Control Plane | HP ProBook 4520s | Static IP `192.168.8.10` |
-| Worker Node | HP Pavilion dm1 | Static IP `192.168.8.11` |
+| Worker Node | Asus X555L | Static IP `192.168.8.11` — added April 2026 |
 
 K3s was installed with `--disable=traefik` and `--disable=servicelb` to remove the defaults and replace them with MetalLB and the NGINX Inc ingress controller managed via GitOps.
 

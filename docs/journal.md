@@ -201,31 +201,32 @@ Deployed [Linkding](https://github.com/sissbruecker/linkding), a self-hosted boo
 This deployment hit the most bugs of any single app so far. Every problem and fix is documented here as a reference.
 
 **Problem: Namespace not appearing in cluster**
+
 The `linkding` namespace was defined in Git but never appeared in the cluster.
 
 **Root cause:** The commit existed locally but had not been pushed to GitHub. Flux pulls from the remote repository — local commits are invisible to it.
 
 **Fix:** `git push`
 
----
 
 **Problem: Secret reference wrong type**
+
 The deployment was pulling `LD_SUPERUSER_PASSWORD` via `configMapKeyRef` — but the source was a `Secret`, not a `ConfigMap`.
 
 **Fix:** Changed to `secretKeyRef`. ConfigMaps and Secrets use different ref types even though the syntax looks identical.
 
----
 
 **Problem: Secret in wrong namespace**
+
 `secrets.yaml` had `namespace: whoop` left over from copying a template. The deployment was in the `linkding` namespace.
 
 **Root cause:** Kubernetes Secrets are namespace-scoped. A pod in `linkding` cannot mount a secret from `whoop`.
 
 **Fix:** Changed `namespace: whoop` → `namespace: linkding`.
 
----
 
 **Problem: Ingress rejected — host already taken**
+
 Created a separate Ingress in the `linkding` namespace for `danielmorgsilva.net/linkding`. The NGINX Inc controller rejected it with:
 ```
 host danielmorgsilva.net is taken by another resource
@@ -243,18 +244,18 @@ annotations:
   nginx.org/mergeable-ingress-type: "minion"   # on linkding-ingress in linkding
 ```
 
----
 
 **Problem: Master Ingress rejected after adding annotation**
+
 After adding the `master` annotation, the Ingress was still rejected.
 
 **Root cause:** A `master` Ingress cannot define any `http.paths`. The master only defines the host. All paths must live in minion Ingresses.
 
 **Fix:** Removed the `http.paths` block from the master Ingress entirely.
 
----
 
 **Problem: 404 on `/linkding` — double slash in paths**
+
 After fixing the ingress, requests reached the linkding pod but returned 404. Logs showed:
 ```
 [uwsgi-static] added mapping for //linkdingstatic => static
@@ -265,9 +266,9 @@ WARNING Not Found: /linkding
 
 **Fix:** Changed `LD_CONTEXT_PATH` value from `/linkding` to `linkding` (no leading slash).
 
----
 
 **Problem: Login failed — passwords didn't match**
+
 Linkding loaded but login failed for any password entered.
 
 **Root cause:** The `apps` Flux Kustomization was missing the `decryption` block. Flux applied the SOPS-encrypted `secrets.yaml` without decrypting it, so the Kubernetes Secret contained the literal `ENC[AES256_GCM,...]` string as the password. Linkding created the superuser with that encrypted string as the password on first startup.
@@ -287,6 +288,47 @@ kubectl rollout restart deployment/linkding -n linkding
 **Resources:**
 - [Mergeable Ingress Types Support](https://github.com/nginx/kubernetes-ingress/tree/v5.4.0/examples/ingress-resources/mergeable-ingress-types)
 - [Cross-namespace configuration](https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/cross-namespace-configuration/)
+
+---
+
+### 12 April 2026 — New Worker Node (Asus X555L)
+
+Added an Asus X555L as a worker node, bringing the cluster to two machines total. Installed Ubuntu Server 24.04.3 LTS, assigned static IP `192.168.8.11`, and joined it to the K3s cluster. Configured `HandleLidSwitch=ignore` in `/etc/systemd/logind.conf` to keep the node running with the lid closed.
+
+**Problem: Secure Boot blocking USB boot**
+
+The ASUS UEFI firmware failed to initialize the MOK (Machine Owner Key) list on boot, displaying `import_mok_state() failed: Out of Resources` and halting before the installer loaded.
+
+**Root cause:** The laptop's NVRAM didn't have enough space to create the MOK entries required by Secure Boot.
+
+**Fix:** Disabled Secure Boot in the BIOS (F2 on boot → Security tab). Not needed for a homelab node.
+
+
+**Problem: SSH key authentication failing**
+
+Initial SSH attempts were rejected with `Permission denied (publickey)`. Editing `/etc/ssh/sshd_config` and setting `PasswordAuthentication yes` had no effect.
+
+**Root cause:** Ubuntu Server 24.04 ships with a cloud-init override file at `/etc/ssh/sshd_config.d/50-cloud-init.conf` that takes precedence over the main config. The setting there was still `no`.
+
+**Fix:** Edited `50-cloud-init.conf` instead, restarted SSH, ran `ssh-copy-id`, then reverted the change.
+
+
+**Problem: Known hosts conflict on `192.168.8.11`**
+After arriving in Denmark and connecting the Asus to the homelab network, SSH refused to connect with WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED.
+
+**Root cause:** During setup in Portugal, the Asus was temporarily configured with a different IP (192.168.1.50). That initial connection was recorded in ~/.ssh/known_hosts on the main machine. When the IP was changed to 192.168.8.11 in Denmark, SSH detected a key mismatch for that address and rejected the connection as a potential security issue.
+
+**Fix:**
+```bash
+ssh-keygen -R 192.168.8.11
+```
+Then reconnected and accepted the new key.
+
+**Key Learning:** Ubuntu Server 24.04's cloud-init creates SSH config overrides in `sshd_config.d/` that silently win over changes to the main `sshd_config`. Always check that directory when SSH config changes don't take effect.
+
+**Resources:**
+- [K3s Installation Guide](https://docs.k3s.io/installation)
+
 
 ---
 

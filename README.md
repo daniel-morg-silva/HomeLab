@@ -33,7 +33,7 @@ HomeLab/
 
 | Layer | Technology |
 |-------|-----------|
-| Hardware | 2x bare-metal laptops (HP ProBook 4520s + HP Pavilion dm1) |
+| Hardware | 2x bare-metal laptops (HP ProBook 4520s + Asus X555L) |
 | OS | Ubuntu Server 24.04.3 LTS |
 | Orchestration | K3s |
 | GitOps | Flux CD v2 |
