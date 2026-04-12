@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  chart:
+    spec:
+      chart: cert-manager
+      version: 1.20.x
+      sourceRef:
+        kind: HelmRepository
+        name: cert-manager
+      interval: 24h # interval for checking a new chart
+  values:
+    crds:
+      enabled: true
+  interval: 1h # interval for checking drifting
+  targetNamespace: cert-manager
+  releaseName: cert-manager
