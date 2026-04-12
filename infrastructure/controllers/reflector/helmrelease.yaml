@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reflector
+  namespace: reflector
+spec:
+  chart:
+    spec:
+      chart: reflector
+      version: 10.0.x
+      sourceRef:
+        kind: HelmRepository
+        name: reflector
+      interval: 24h # interval for checking a new chart
+  interval: 1h # interval for checking drifting
+  targetNamespace: reflector
+  releaseName: reflector
