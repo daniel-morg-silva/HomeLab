@@ -5,6 +5,11 @@ metadata:
   namespace: linkding    
 spec:
   ingressClassName: nginx
+  
+  #tls:
+  #- hosts:
+  #    - linkding.danielmorgsilva.dev
+  #  secretName: danielmorgsilva-dev-secret
   rules:
   - host: linkding.danielmorgsilva.net
     http:
