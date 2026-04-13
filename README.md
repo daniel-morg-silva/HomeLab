@@ -40,7 +40,10 @@ HomeLab/
 | Load Balancer | MetalLB |
 | Ingress | NGINX Ingress Controller (NGINX Inc) |
 | Database | CloudNativePG (PostgreSQL operator) |
+| TLS | cert-manager + Let's Encrypt (Cloudflare DNS-01) |
 | Secret Management | SOPS + age encryption |
+| Secret Sync | reflector (cross-namespace mirroring) |
+| Public Exposure | Cloudflare Tunnel (cloudflared) |
 
 ---
 

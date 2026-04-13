@@ -332,7 +332,91 @@ Then reconnected and accepted the new key.
 
 ---
 
+### April 12–13 2026 - TLS, cert-manager, and Public Exposure via Cloudflare Tunnel
+
+This phase focused on securing all cluster services with HTTPS and exposing the homelab publicly — with no open ports on the home router.
+
+#### cert-manager
+
+Deployed cert-manager via Flux following the standard controller pattern (`infrastructure/controllers/cert-manager/`). Used the OCI registry as the chart source (`oci://quay.io/jetstack/charts`) per the official cert-manager recommendation. CRDs were installed via `values.crds.enabled: true`.
+
+A `ClusterIssuer` was configured to use Let's Encrypt with the DNS-01 challenge via Cloudflare API token (stored as a SOPS-encrypted secret in `infrastructure/config/homelab/cert-manager/`). A wildcard `Certificate` resource was created for `*.danielmorgsilva.dev` and `danielmorgsilva.dev`, stored in the `cert-manager` namespace.
+
+**Problem: Let's Encrypt rate limit hit**
+
+During debugging, the certificate secret was deleted multiple times, causing Let's Encrypt to issue 5 certificates against the same domain set within 168 hours — hitting the production rate limit. Resolution window: 2026-04-13 00:29:55 UTC.
+
+**Fix:** Waited for the rate limit window to expire.
+
+**Key Learning:** Never delete the certificate secret during debugging — cert-manager manages renewal automatically. The secret deletion triggers a new issuance attempt, and repeated attempts burn through the rate limit quickly.
+
+
+#### reflector
+
+Deployed `emberstack/reflector` to mirror the wildcard TLS secret from the `cert-manager` namespace to other namespaces (`linkding`, etc.). The `Certificate` resource uses `secretTemplate.annotations` to configure auto-reflection.
+
+**Problem: Silent skip — reflection not happening**
+
+The TLS secret was not being mirrored to the target namespace despite the reflector pod running.
+
+**Root cause:** `reflection-auto-enabled` requires `reflection-allowed` to also be `true`. Without both annotations, reflector silently skips mirroring.
+
+**Fix:** All four annotations are required on the Certificate's `secretTemplate`:
+
+```yaml
+reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "linkding"
+reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "linkding"
+```
+
+
+#### TLS on Ingresses
+
+Updated ingresses for `danielmorgsilva.dev` and `linkding.danielmorgsilva.dev` to use the wildcard certificate.
+
+**Problem: TLS rejected on minion Ingress**
+
+Placing the `tls:` block on the minion Ingress caused the NGINX Inc controller to reject it.
+
+**Root cause:** The NGINX Inc controller requires TLS to be configured exclusively on the master Ingress. Minion Ingresses inherit TLS from the master.
+
+**Fix:** Moved the `tls:` block and `nginx.org/redirect-to-https: "true"` annotation to the master Ingress only.
+
+**Key Learning:** The `tls.secretName` must reference a secret in the same namespace as the master Ingress — hence the need for reflector to mirror the cert-manager secret into that namespace.
+
+
+#### Cloudflare Tunnel
+
+Registered `danielmorgsilva.dev` via Cloudflare Registrar. Deployed `cloudflared` as a Kubernetes Deployment in the `cloudflared` namespace using the official Cloudflare container image, with the tunnel token stored as a SOPS-encrypted secret.
+
+Configured two public application routes in the Cloudflare Zero Trust dashboard:
+- `danielmorgsilva.dev` → `https://192.168.8.100`
+- `linkding.danielmorgsilva.dev` → `https://192.168.8.100`
+
+Both routes use **Match SNI to Host** to ensure correct TLS hostname matching when connecting via IP.
+
+Both services are now publicly accessible from the internet with valid HTTPS certificates, with no open ports on the home router and no home IP exposure.
+
+
+#### Flux Dependency Chain Refactor
+
+Refactored the Flux Kustomization structure to remove circular dependencies and add granular ordering. Four independent chains now run in parallel:
+
+```
+metallb-controllers → metallb-config → nginx-ingress-controllers → nginx-config
+
+infrastructure-controllers → infrastructure-config
+
+cloudflared-config → cloudflared-controllers
+
+apps  (independent)
+```
+
+cloudflared is deliberately split into two kustomizations: `cloudflared-config` runs first (no deps) and creates the SOPS-decrypted tunnel token secret; `cloudflared-controllers` depends on it and deploys the cloudflared Deployment that mounts that secret.
+
+---
+
 ## Next Objectives
 
 1. Set up centralized cluster monitoring with Prometheus and Grafana.
-2. Implement TLS certificates for HTTPS access via cert-manager.
