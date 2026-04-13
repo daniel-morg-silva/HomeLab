@@ -2,9 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: master-ingress
-  namespace: default
+  namespace: nginx
   annotations:
     nginx.org/mergeable-ingress-type: "master"
+    nginx.org/redirect-to-https: "true"
 spec:
   ingressClassName: nginx
 
@@ -12,6 +13,6 @@ spec:
   - hosts:
       - danielmorgsilva.dev
     secretName: danielmorgsilva-dev-secret
-    
+
   rules:
-  - host: danielmorgsilva.net
+  - host: danielmorgsilva.dev
