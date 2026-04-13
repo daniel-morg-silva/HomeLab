@@ -291,7 +291,7 @@ kubectl rollout restart deployment/linkding -n linkding
 
 ---
 
-### 12 April 2026 — New Worker Node (Asus X555L)
+### 9 April 2026 — New Worker Node (Asus X555L)
 
 Added an Asus X555L as a worker node, bringing the cluster to two machines total. Installed Ubuntu Server 24.04.3 LTS, assigned static IP `192.168.8.11`, and joined it to the K3s cluster. Configured `HandleLidSwitch=ignore` in `/etc/systemd/logind.conf` to keep the node running with the lid closed.
 
