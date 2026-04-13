@@ -102,3 +102,37 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+
+---
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudflared-config
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./infrastructure/config/homelab/cloudflared
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+---
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cloudflared-controllers
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cloudflared-config
+  interval: 10m0s
+  path: ./infrastructure/controllers/cloudflared
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
