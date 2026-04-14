@@ -415,6 +415,18 @@ apps  (independent)
 
 cloudflared is deliberately split into two kustomizations: `cloudflared-config` runs first (no deps) and creates the SOPS-decrypted tunnel token secret; `cloudflared-controllers` depends on it and deploys the cloudflared Deployment that mounts that secret.
 
+**Resources:**
+- [Certificate resource](https://cert-manager.io/docs/usage/certificate/)
+- [ Configure cert-manager ClusterIssuer for Cluster-Wide Certificate Authority ](https://oneuptime.com/blog/post/2026-02-09-cert-manager-clusterissuer/view)
+- [ Let's Encrypt - Getting Started ](https://letsencrypt.org/getting-started/)
+- [ Advanced configuration with Annotations ](https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/)
+- [ Kubernetes - Ingress ](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+- [ Reflector - Github ](https://github.com/emberstack/kubernetes-reflector)
+- [ Cert-Manager - Syncing Secrets Across Namespaces ](https://cert-manager.io/docs/devops-tips/syncing-secrets-across-namespaces/)
+- [ Cert-Manager - Troubleshooting Problems with ACME / Let's Encrypt Certificates ](https://cert-manager.io/docs/troubleshooting/acme/)
+
+
+
 ---
 
 ## Next Objectives
