@@ -334,7 +334,7 @@ Then reconnected and accepted the new key.
 
 ### April 12–13 2026 - TLS, cert-manager, and Public Exposure via Cloudflare Tunnel
 
-This phase focused on securing all cluster services with HTTPS and exposing the homelab publicly — with no open ports on the home router.
+This update focused on securing all cluster services with HTTPS and exposing the homelab publicly — with no open ports on the home router.
 
 #### cert-manager
 
@@ -416,6 +416,7 @@ apps  (independent)
 cloudflared is deliberately split into two kustomizations: `cloudflared-config` runs first (no deps) and creates the SOPS-decrypted tunnel token secret; `cloudflared-controllers` depends on it and deploys the cloudflared Deployment that mounts that secret.
 
 **Resources:**
+- [ What Is HTTPS? How Does It Work? ](https://www.youtube.com/watch?v=D7ijCjE31GA)
 - [Certificate resource](https://cert-manager.io/docs/usage/certificate/)
 - [ Configure cert-manager ClusterIssuer for Cluster-Wide Certificate Authority ](https://oneuptime.com/blog/post/2026-02-09-cert-manager-clusterissuer/view)
 - [ Let's Encrypt - Getting Started ](https://letsencrypt.org/getting-started/)
@@ -424,9 +425,7 @@ cloudflared is deliberately split into two kustomizations: `cloudflared-config` 
 - [ Reflector - Github ](https://github.com/emberstack/kubernetes-reflector)
 - [ Cert-Manager - Syncing Secrets Across Namespaces ](https://cert-manager.io/docs/devops-tips/syncing-secrets-across-namespaces/)
 - [ Cert-Manager - Troubleshooting Problems with ACME / Let's Encrypt Certificates ](https://cert-manager.io/docs/troubleshooting/acme/)
-
-
-
+- [ Cloudflared - Kubernetes Setup ](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/deployment-guides/kubernetes/)
 ---
 
 ## Next Objectives
