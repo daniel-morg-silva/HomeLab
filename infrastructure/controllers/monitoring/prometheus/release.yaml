@@ -15,3 +15,52 @@ spec:
   interval: 1h # interval for checking drifting
   targetNamespace: monitoring
   releaseName: prometheus
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Prometheus configuration
+    prometheus:
+      prometheusSpec:
+        retention: 30d # how much time to keep the metrics data
+        retentionSize: 40GB # the amount of storage to cap saving data
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 50Gi
+        # Resource limits for Prometheus
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 500m
+          limits:
+            memory: 2Gi
+            cpu: "1"
+        # Enable service monitor auto-discovery
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+
+    # Alertmanager configuration
+    alertmanager:
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
+
+    # Grafana configuration (bundled with the stack)
+    grafana:
+      admin:
+        existingSecret: grafana-secret
+        userKey: admin-user
+        passwordKey: admin-password
+      persistence:
+        enabled: true
+        size: 5Gi
