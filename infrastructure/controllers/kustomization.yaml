@@ -2,3 +2,4 @@ resources:
   - cloudnative-pg
   - cert-manager
   - reflector
+  - monitoring
