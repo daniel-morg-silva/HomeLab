@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+  annotations:
+    nginx.org/redirect-to-https: "true"
+spec:
+  ingressClassName: nginx
+  
+  tls:
+  - hosts:
+      - grafana.danielmorgsilva.dev
+    secretName: danielmorgsilva-dev-secret
+  rules:
+  - host: grafana.danielmorgsilva.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-grafana
+            port:
+              number: 80
