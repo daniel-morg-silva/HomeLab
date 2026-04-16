@@ -428,6 +428,24 @@ cloudflared is deliberately split into two kustomizations: `cloudflared-config` 
 - [ Cloudflared - Kubernetes Setup ](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/deployment-guides/kubernetes/)
 ---
 
+### 16 April 2026 — Zero Trust SSH Access
+
+Configured remote SSH access to the cluster nodes using Cloudflare Access and short-lived certificates - no open ports on the home router, identity-verified on every new connection.
+
+**What was done:**
+- Created a Cloudflare Access self-hosted application for `ssh.danielmorgsilva.dev` with an email-based allow policy
+- Added a public hostname route in the Cloudflare Tunnel dashboard: `ssh.danielmorgsilva.dev` → `ssh://192.168.8.10:22`
+- Fetched Cloudflare's SSH CA public key from `https://danielmorgsilva.cloudflareaccess.com/cdn-cgi/access/certs` and added it as `TrustedUserCAKeys` in `/etc/ssh/sshd_config` on the master node
+- Installed `cloudflared` on the client machine (Fedora) and configured `~/.ssh/config` to use it as a ProxyCommand
+
+**How it works:**
+Running `ssh ssh.danielmorgsilva.dev` triggers a browser-based authentication flow via Cloudflare Access. On success, Cloudflare issues a short-lived certificate to the client. The SSH session is then proxied through the existing `cloudflared` tunnel in the cluster — no static SSH keys on the client, no open ports on the router.
+
+**Key Learning:** This is the zero-trust SSH pattern used in production environments. Authentication is identity-based and time-limited, rather than relying on long-lived keys sitting on client machines.
+
+**Resources:**
+- [Cloudflare Access SSH Documentation](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/use-cases/ssh/ssh-cloudflared-authentication/)
+
 ## Next Objectives
 
 1. Set up centralized cluster monitoring with Prometheus and Grafana.

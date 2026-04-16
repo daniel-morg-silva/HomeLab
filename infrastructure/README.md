@@ -37,7 +37,10 @@ Cluster-level controllers and configuration, all managed via Flux CD HelmRelease
 - **Namespace:** `cloudflared`
 - **Purpose:** Cloudflare Tunnel agent — exposes cluster services publicly with no open ports on the home router
 - **Tunnel token:** SOPS-encrypted secret
-- **Routes:** `danielmorgsilva.dev` and `linkding.danielmorgsilva.dev` → `https://192.168.8.100`
+- **Routes:**
+  - `danielmorgsilva.dev` → `https://192.168.8.100`
+  - `linkding.danielmorgsilva.dev` → `https://192.168.8.100`
+  - `ssh.danielmorgsilva.dev` → `ssh://192.168.8.10:22` (Zero Trust SSH via Cloudflare Access)
 
 ---
 
