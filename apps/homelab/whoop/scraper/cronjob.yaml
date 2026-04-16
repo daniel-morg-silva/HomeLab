@@ -45,6 +45,11 @@ spec:
                 configMapKeyRef:
                   name: whoop-config
                   key: WHOOP_DB_HOST
+            - name: WHOOP_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: whoop-config
+                  key: WHOOP_DB_NAME
             - name: WHOOP_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
