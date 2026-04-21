@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: danielmorgsilva-dev
+  namespace: danielmorgsilva-dev
+  labels:
+    app: danielmorgsilva-dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: danielmorgsilva-dev
+  template:
+    metadata:
+      labels:
+        app: danielmorgsilva-dev
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/daniel-morg-silva/danielmorgsilva-dev:v1
+        ports:
+        - containerPort: 80
