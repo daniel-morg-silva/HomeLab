@@ -10,11 +10,6 @@ metadata:
 spec:
   ingressClassName: nginx
   
-  tls:
-  - hosts:
-      - danielmorgsilva.dev
-    secretName: danielmorgsilva-dev-secret
-
   rules:
   - host: danielmorgsilva.dev
     http:
