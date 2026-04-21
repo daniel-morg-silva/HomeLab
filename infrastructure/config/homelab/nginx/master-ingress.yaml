@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: master-ingress
-  namespace: nginx
+  namespace: danielmorgsilva-dev
   annotations:
     nginx.org/mergeable-ingress-type: "master"
     nginx.org/redirect-to-https: "true"
