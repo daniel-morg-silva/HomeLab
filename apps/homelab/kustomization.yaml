@@ -1,6 +1,6 @@
 resources:
   - ../base
-  - nginx
+  - danielmorgsilva-dev
   - whoop
   - linkding
   - danielmorgsilva-dev
