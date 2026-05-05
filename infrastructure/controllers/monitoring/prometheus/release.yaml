@@ -24,8 +24,6 @@ spec:
     # Prometheus configuration
     prometheus:
       prometheusSpec:
-        nodeSelector:
-          kubernetes.io/hostname: k3s-worker1
         retention: 30d # how much time to keep the metrics data
         retentionSize: 40GB # the amount of storage to cap saving data
         storageSpec:
@@ -50,8 +48,6 @@ spec:
     # Alertmanager configuration
     alertmanager:
       alertmanagerSpec:
-        nodeSelector:
-          kubernetes.io/hostname: k3s-worker1
         secrets:
           - alertmanager-secret
         storage:
@@ -84,8 +80,6 @@ spec:
 
     # Grafana configuration (bundled with the stack)
     grafana:
-      nodeSelector:
-        kubernetes.io/hostname: k3s-worker1
       admin:
         existingSecret: grafana-secret
         userKey: admin-user
