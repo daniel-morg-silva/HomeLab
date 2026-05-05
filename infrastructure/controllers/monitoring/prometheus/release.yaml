@@ -4,6 +4,7 @@ metadata:
   name: prometheus
   namespace: monitoring
 spec:
+  suspend: true
   chart:
     spec:
       chart: kube-prometheus-stack
