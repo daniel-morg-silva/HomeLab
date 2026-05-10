@@ -38,9 +38,12 @@ Cluster-level controllers and configuration, all managed via Flux CD HelmRelease
 - **Purpose:** Cloudflare Tunnel agent — exposes cluster services publicly with no open ports on the home router
 - **Tunnel token:** SOPS-encrypted secret
 - **Routes:**
-  - `danielmorgsilva.dev` → `https://192.168.8.100`
-  - `linkding.danielmorgsilva.dev` → `https://192.168.8.100`
-  - `ssh.danielmorgsilva.dev` → `ssh://192.168.8.10:22` (Zero Trust SSH via Cloudflare Access)
+  - `danielmorgsilva.dev` → `https://192.168.87.100`
+  - `linkding.danielmorgsilva.dev` → `https://192.168.87.100`
+  - `grafana.danielmorgsilva.dev` → `https://192.168.87.100`
+  - `ssh.danielmorgsilva.dev` → `ssh://192.168.87.10:22` (Zero Trust SSH via Cloudflare Access)
+
+All HTTPS routes have **Match SNI to Host** enabled in the Cloudflare tunnel configuration so the correct TLS certificate is served when nginx receives the request.
 
 ---
 
@@ -48,8 +51,9 @@ Cluster-level controllers and configuration, all managed via Flux CD HelmRelease
 
 ### MetalLB IP Pool
 Defined in `config/homelab/metallb/metallb-config.yaml`:
-- **Pool:** `192.168.8.100 – 192.168.8.140`
+- **Pool:** `192.168.87.100 – 192.168.87.140`
 - **Mode:** L2 Advertisement
+- **Network:** VLAN 1 (home network) — speakers communicate over VLAN 10 (cluster network) but advertise on VLAN 1 so home devices can reach the LoadBalancer IP
 
 ### NGINX Master Ingress
 Defined in `config/homelab/nginx/`:

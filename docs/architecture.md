@@ -2,12 +2,40 @@
 
 ## Hardware
 
-| Role | Machine | Notes |
-|------|---------|-------|
-| Master / Control Plane | HP ProBook 4520s | Static IP `192.168.8.10` |
-| Worker Node | Asus X555L | Static IP `192.168.8.11` — added April 2026 |
+| Role | Machine | Cluster IP | Home Network IP |
+|------|---------|------------|-----------------|
+| Master / Control Plane | HP ProBook 4520s | `10.0.0.1` (`ens5.10`) | `192.168.87.10` (`ens5.1`) |
+| Worker Node | Asus X555L | `10.0.0.2` (`enp2s0.10`) | `192.168.87.11` (`enp2s0.1`) |
 
 K3s was installed with `--disable=traefik` and `--disable=servicelb` to remove the defaults and replace them with MetalLB and the NGINX Inc ingress controller managed via GitOps.
+
+K3s uses the `10.0.0.x` cluster network for inter-node traffic (flannel VXLAN, kubelet, control plane communication). The `192.168.87.x` home network is used only for external-facing services (MetalLB LoadBalancer IPs, ingress traffic from Cloudflare Tunnel).
+
+---
+
+## Physical Network
+
+A TP-Link TL-SG605E managed switch connects both nodes and the home router, with 802.1Q VLAN tagging to isolate cluster traffic from home network traffic.
+
+```
+                    ┌─────────────────────────┐
+                    │   TL-SG605E Switch      │
+                    │                         │
+  Master ───────────┤ Port 1  (tagged 1, 10)  │
+  Worker ───────────┤ Port 2  (tagged 1, 10)  │
+  (future nodes) ───┤ Port 3  (tagged 1, 10)  │
+  (future nodes) ───┤ Port 4  (tagged 1, 10)  │
+  Home Router ──────┤ Port 5  (untagged 1)    │
+                    └─────────────────────────┘
+```
+
+**VLAN 1 (default)** — home network, internet access, MetalLB LoadBalancer traffic. Untagged on the router uplink, tagged on node ports.
+
+**VLAN 10 (cluster)** — private cluster network for K3s inter-node traffic. Tagged on node ports only, no router access. Subnet `10.0.0.0/24`.
+
+Each node uses 802.1Q sub-interfaces configured in netplan: `ens5.1`/`ens5.10` on the master, `enp2s0.1`/`enp2s0.10` on the worker. The Linux kernel handles VLAN tagging; the switch enforces traffic isolation.
+
+This setup means cluster operations are independent of the home network — changing routers, switching ISPs, or moving the cluster to a different network does not require reconfiguring K3s.
 
 ---
 
@@ -20,18 +48,19 @@ Internet
 Cloudflare Tunnel (cloudflared)     ← no open ports on home router
     │
     ▼
-192.168.8.100  (MetalLB assigned IP)
+192.168.87.100  (MetalLB assigned IP)
     │
     ▼
 NGINX Ingress Controller  (nginx-ingress namespace)
     │
-    ├── danielmorgsilva.dev/          → nginx-service (default namespace)
-    └── danielmorgsilva.dev/linkding  → linkding service (linkding namespace)
+    ├── danielmorgsilva.dev/                  → danielmorgsilva-dev service
+    ├── linkding.danielmorgsilva.dev/         → linkding service
+    └── grafana.danielmorgsilva.dev/          → prometheus-grafana service
 ```
 
-MetalLB operates in L2 mode and assigns IPs from the pool `192.168.8.100–192.168.8.140`.
+MetalLB operates in L2 mode and assigns IPs from the pool `192.168.87.100–192.168.87.140` on the home network (VLAN 1). MetalLB speakers run on both nodes and communicate over the cluster network (VLAN 10).
 
-The cluster is publicly accessible via Cloudflare Tunnel with no open ports on the home router and no home IP exposure. Cloudflare forwards `danielmorgsilva.dev` and `linkding.danielmorgsilva.dev` to `https://192.168.8.100`, using Match SNI to Host for correct TLS hostname matching.
+The cluster is publicly accessible via Cloudflare Tunnel with no open ports on the home router and no home IP exposure. Cloudflare forwards traffic to `https://192.168.87.100`, using **Match SNI to Host** to ensure correct TLS hostname matching when connecting via IP.
 
 ---
 
@@ -54,7 +83,7 @@ annotations:
   nginx.org/mergeable-ingress-type: "minion"
 ```
 
-TLS must be configured on the master ingress only — the NGINX Inc controller rejects TLS blocks on minion ingresses.
+TLS must be configured on the master ingress only — the NGINX Inc controller rejects TLS blocks on minion ingresses. The `nginx.org/redirect-to-https` annotation must also be set only on the master; setting it on a minion causes nginx to reject the configuration.
 
 ---
 
@@ -73,46 +102,4 @@ reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
 reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "linkding"
 ```
 
-> Important: `reflection-auto-enabled` requires `reflection-allowed` to also be `true`. Without both, reflector silently skips mirroring.
-
-The TLS secret is then referenced by the master Ingress in `infrastructure/config/homelab/nginx/`.
-
----
-
-## Flux CD Dependency Chain
-
-Flux reconciles resources in a specific order to avoid race conditions. There are four independent chains running in parallel:
-
-```
-metallb-controllers → metallb-config → nginx-ingress-controllers → nginx-config
-
-infrastructure-controllers → infrastructure-config
-
-cloudflared-config → cloudflared-controllers
-
-apps  (independent, watches apps/homelab)
-```
-
-cloudflared is split into two kustomizations deliberately: `cloudflared-config` creates the SOPS-decrypted tunnel token secret first, then `cloudflared-controllers` deploys the cloudflared Deployment that mounts it.
-
-Each step uses `dependsOn` and `wait: true` so Flux blocks until CRDs and controllers are fully ready before proceeding.
-
----
-
-## Secret Management
-
-Secrets are encrypted at rest in Git using [SOPS](https://github.com/getsops/sops) with an age key pair.
-
-- The age private key is stored as a Kubernetes secret (`sops-age`) in the `flux-system` namespace
-- The `.sops.yaml` at `clusters/homelab/.sops.yaml` defines the encryption rules
-- Flux decrypts secrets at apply time via the `decryption` block in each Kustomization:
-
-```yaml
-spec:
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
-```
-
-> Important: every Flux Kustomization that includes SOPS-encrypted files must have this decryption block, otherwise secrets are applied with their encrypted values intact.
+> Important: `reflection-auto-enabled` requires `reflection-allowed` to also be `true`.

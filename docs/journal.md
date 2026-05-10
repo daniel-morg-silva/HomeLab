@@ -446,6 +446,64 @@ Running `ssh ssh.danielmorgsilva.dev` triggers a browser-based authentication fl
 **Resources:**
 - [Cloudflare Access SSH Documentation](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/use-cases/ssh/ssh-cloudflared-authentication/)
 
+---
+
+### 5–7 May 2026 — Network Migration and VLAN Setup
+
+A network change cascaded into a multi-day cluster recovery and ended in a complete network architecture overhaul. The original setup (both nodes on WiFi, single subnet, IPs assigned by router DHCP) turned out to be the root cause of nearly every problem encountered during this period.
+
+**Trigger:** A roommate left and took the router with them. The new router used a different subnet (`192.168.87.x` instead of `192.168.8.x`), forcing a network change.
+
+**Problem: K3s crash-looping after network change**
+After the IP change, K3s crashed continuously with `failed to find interface with specified node ip`. The node IP stored in K3s's SQLite database was the old `192.168.8.10`, and K3s could not find an interface with that IP on the new network. Setting `--node-ip` in `config.yaml` was ignored due to a duplicate flag conflict with the systemd service file. K3s restarted 500+ times over several hours, accumulating database bloat and triggering an IO storm that made the master unresponsive.
+
+**Root cause:** Node IP detection in K3s reads from multiple sources, and conflicting configuration causes silent failures. The `node-ip` flag must be set in exactly one place (the systemd service file), and existing node records in the database must be deleted when the IP changes.
+
+**Fix:**
+1. Updated `--node-ip` in `/etc/systemd/system/k3s.service` (master) and `/etc/systemd/system/k3s-agent.service` (worker)
+2. Removed `node-ip` from `/etc/rancher/k3s/config.yaml` to avoid duplicate flag
+3. Updated `K3S_URL` in `/etc/systemd/system/k3s-agent.service.env` on the worker
+4. Deleted node records from kine: `DELETE FROM kine WHERE name LIKE '%/registry/nodes/%'`
+
+**Problem: Worker WiFi unreliable**
+With both nodes on WiFi, inter-node traffic suffered up to 66% packet loss. CoreDNS, MetalLB controller, cert-manager webhook, and other components running on the worker became unreachable from the master, causing cascading failures. Pods stuck in `Terminating`, endpoints empty despite running pods, kubelet timeouts.
+
+**Fix (temporary):** Moved critical components to the master via imperative `kubectl patch` with nodeSelector, suspended Prometheus stack to free RAM. This kept the cluster functional but introduced GitOps drift.
+
+**Fix (permanent):** Connected the worker via wired ethernet (`enp2s0`) and configured a static IP in netplan. Inter-node packet loss dropped to 0%.
+
+#### VLAN Setup with TL-SG605E Switch
+
+Bought a TP-Link TL-SG605E managed switch to set up a dedicated private network between the nodes, isolating cluster traffic from the home network entirely.
+
+**Why a dedicated cluster network:** With both nodes on the home network, all inter-node traffic (flannel VXLAN, kubelet, control plane communication) had to traverse the router. This added latency, depended on router stability, and meant any home network change could break the cluster.
+
+**Design:**
+- **VLAN 1 (default)** — home network access, ports 1-4 tagged, port 5 untagged (router uplink)
+- **VLAN 10 (cluster)** — private cluster network, ports 1-4 tagged, no router access
+- Each node uses 802.1Q sub-interfaces: `ens5.1`/`ens5.10` on master, `enp2s0.1`/`enp2s0.10` on worker
+- Cluster subnet: `10.0.0.0/24` (master `10.0.0.1`, worker `10.0.0.2`)
+- Home subnet preserved: master `192.168.87.10`, worker `192.168.87.11`
+
+**What was done:**
+1. Configured 802.1Q VLANs on the switch (VLAN 1 and VLAN 10)
+2. Set tagged membership for ports 1-4 on both VLANs, untagged port 5 on VLAN 1
+3. Updated netplan on both nodes with VLAN sub-interfaces
+4. Updated K3s `--node-ip` to use `10.0.0.x` addresses
+5. Added `tls-san` entries in `/etc/rancher/k3s/config.yaml` to include both old and new IPs in the API server certificate
+6. Updated `K3S_URL` on the worker to `https://10.0.0.1:6443`
+7. Deleted node records from kine to force re-registration with new IPs
+
+**Result:** Inter-node latency dropped from ~8ms (via router) to ~0.3ms (direct switch connection). The cluster network is now completely independent of the home network — future router changes will not affect cluster operations.
+
+**Key Learning:** Network architecture matters as much as Kubernetes architecture. A homelab built on shared, unstable network infrastructure will inherit all the instability of that infrastructure. Separating cluster traffic onto a dedicated VLAN is a small change with disproportionate benefits: it isolates failure domains, reduces latency, and eliminates a class of cascading failures caused by external network changes.
+
+**Resources:**
+- [ Tagged vs Untagged VLAN: What's the Difference? ](https://youtu.be/_BfLSd6C-X8?si=v_vw-d5-sR5ZHqTb)
+- [TP-Link TL-SG605E User Guide](https://www.tp-link.com/en/support/download/tl-sg605e/)
+- [Netplan VLAN Configuration](https://netplan.readthedocs.io/en/stable/examples/#using-vlans)
+- [K3s Networking Documentation](https://docs.k3s.io/installation/network-options)
+
 ## Next Objectives
 
 1. Set up centralized cluster monitoring with Prometheus and Grafana.
