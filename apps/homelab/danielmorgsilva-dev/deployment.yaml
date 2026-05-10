@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: web
-        image: ghcr.io/daniel-morg-silva/danielmorgsilva-dev:v1.3
+        image: ghcr.io/daniel-morg-silva/danielmorgsilva-dev:v3
         ports:
         - containerPort: 80
