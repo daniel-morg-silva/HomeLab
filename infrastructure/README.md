@@ -41,7 +41,17 @@ Cluster-level controllers and configuration, all managed via Flux CD HelmRelease
   - `danielmorgsilva.dev` → `https://192.168.87.100`
   - `linkding.danielmorgsilva.dev` → `https://192.168.87.100`
   - `grafana.danielmorgsilva.dev` → `https://192.168.87.100`
+  - `alertmanager.danielmorgsilva.dev` → `https://192.168.87.100`
   - `ssh.danielmorgsilva.dev` → `ssh://192.168.87.10:22` (Zero Trust SSH via Cloudflare Access)
+
+### kube-prometheus-stack
+- **Namespace:** `monitoring`
+- **Chart:** `kube-prometheus-stack` (prometheus-community) — bundles Prometheus, Grafana, and Alertmanager
+- **Chart version:** `83.4.x`
+- **Storage:** Prometheus: 50 Gi PVC (30-day retention, 40 GB size cap); Alertmanager: 5 Gi PVC; Grafana: 5 Gi PVC
+- **Grafana:** Admin credentials from SOPS-encrypted `grafana-secret`; exposed at `grafana.danielmorgsilva.dev` via a standard Ingress in `apps/homelab/grafana/`
+- **Alertmanager:** Email alerts via Gmail SMTP; app password stored in SOPS-encrypted `alertmanager-secret`; exposed at `alertmanager.danielmorgsilva.dev` via a standard Ingress in `apps/homelab/alertmanager/`
+- **Disabled default rules:** `kubeProxy`, `kubeControllerManager`, `kubeSchedulerAlerting`, `kubeSchedulerRecording` — these targets do not exist as standalone processes in K3s and would otherwise produce persistent false-positive alerts
 
 All HTTPS routes have **Match SNI to Host** enabled in the Cloudflare tunnel configuration so the correct TLS certificate is served when nginx receives the request.
 
@@ -65,17 +75,19 @@ Defined in `config/homelab/nginx/`:
 
 ## Dependency Chain
 
-Four independent chains run in parallel:
+Five independent chains run in parallel:
 
 ```
 metallb-controllers → metallb-config → nginx-ingress-controllers → nginx-config
-
-infrastructure-controllers → infrastructure-config
+                                                                         ↓
+infrastructure-controllers → infrastructure-config          monitoring-config → monitoring-controllers
 
 cloudflared-config → cloudflared-controllers
 
 apps  (independent)
 ```
+
+`monitoring-controllers` has two `dependsOn` entries: `monitoring-config` (secrets must exist before the HelmRelease is applied) and `nginx-config` (the Ingress controller must be ready before Grafana and Alertmanager ingresses can be configured).
 
 cloudflared is split into two kustomizations: `cloudflared-config` creates the SOPS-decrypted tunnel token secret first, then `cloudflared-controllers` deploys the cloudflared Deployment that depends on it.
 

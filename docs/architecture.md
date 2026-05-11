@@ -55,7 +55,8 @@ NGINX Ingress Controller  (nginx-ingress namespace)
     │
     ├── danielmorgsilva.dev/                  → danielmorgsilva-dev service
     ├── linkding.danielmorgsilva.dev/         → linkding service
-    └── grafana.danielmorgsilva.dev/          → prometheus-grafana service
+    ├── grafana.danielmorgsilva.dev/          → prometheus-grafana service
+    └── alertmanager.danielmorgsilva.dev/     → prometheus-kube-prometheus-alertmanager service
 ```
 
 MetalLB operates in L2 mode and assigns IPs from the pool `192.168.87.100–192.168.87.140` on the home network (VLAN 1). MetalLB speakers run on both nodes and communicate over the cluster network (VLAN 10).
@@ -97,9 +98,27 @@ Wildcard TLS certificates for `*.danielmorgsilva.dev` and `danielmorgsilva.dev` 
 
 ```yaml
 reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "linkding"
+reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "linkding,nginx,monitoring,danielmorgsilva-dev"
 reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "linkding"
+reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "linkding,nginx,monitoring,danielmorgsilva-dev"
 ```
 
 > Important: `reflection-auto-enabled` requires `reflection-allowed` to also be `true`.
+
+---
+
+## Flux Dependency Chains
+
+Five independent chains run in parallel, enforced via `dependsOn` in `clusters/homelab/infrastructure.yaml`:
+
+```
+metallb-controllers → metallb-config → nginx-ingress-controllers → nginx-config
+                                                                         ↓
+infrastructure-controllers → infrastructure-config          monitoring-config → monitoring-controllers
+
+cloudflared-config → cloudflared-controllers
+
+apps  (independent)
+```
+
+`monitoring-controllers` depends on both `monitoring-config` (Grafana and Alertmanager secrets must exist before the HelmRelease runs) and `nginx-config` (the Ingress controller must be ready before Grafana and Alertmanager ingress resources can be accepted).

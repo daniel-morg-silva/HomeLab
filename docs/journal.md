@@ -504,6 +504,58 @@ Bought a TP-Link TL-SG605E managed switch to set up a dedicated private network 
 - [Netplan VLAN Configuration](https://netplan.readthedocs.io/en/stable/examples/#using-vlans)
 - [K3s Networking Documentation](https://docs.k3s.io/installation/network-options)
 
-## Next Objectives
+---
 
-1. Set up centralized cluster monitoring with Prometheus and Grafana.
+### 15 April – 11 May 2026 — Monitoring Stack (kube-prometheus-stack)
+
+Deployed a full observability stack using kube-prometheus-stack, which bundles Prometheus, Grafana, and Alertmanager into a single Helm chart managed via a Flux HelmRelease in `infrastructure/controllers/monitoring/`. By this point cert-manager, reflector, and Cloudflare Tunnel were already in place from the April 12–13 TLS phase — the monitoring stack could lean directly on that infrastructure. The wildcard TLS certificate managed by cert-manager was already being reflected into the `monitoring` namespace by reflector, so Grafana and Alertmanager got HTTPS immediately without any additional cert work. The `grafana.danielmorgsilva.dev` tunnel route was already registered in Cloudflare from the TLS phase; only the new `alertmanager.danielmorgsilva.dev` route needed to be added.
+
+**Problem: Resource exhaustion during the VLAN migration window**
+
+Deploying the monitoring stack while the cluster was simultaneously undergoing the network migration in early May caused both nodes to hit memory limits. Prometheus alone requests 1 Gi and caps at 2 Gi; with Grafana and Alertmanager alongside, the two-node cluster ran out of headroom. Flux suspended the HelmRelease twice over the period (once manually, once forced by node pressure), and the stack had to be redeployed after the VLAN migration stabilised.
+
+**Root cause:** The bare-metal nodes have limited RAM. Stacking a full monitoring deployment on top of an already-stressed cluster during a network reconfiguration exceeded available memory.
+
+**Fix:** Set `suspend: true` on the monitoring HelmRelease until the cluster was stable post-VLAN migration. Added a `nodeSelector` to pin monitoring workloads to the worker node, keeping control plane memory free.
+
+
+**Problem: k3s false positives — alerts firing immediately on deployment**
+
+Within minutes of the stack coming up, Alertmanager fired `KubeControllerManagerDown`, `KubeSchedulerDown`, and `KubeProxyDown` on every alert cycle, flooding the email inbox.
+
+**Root cause:** kube-prometheus-stack ships default alerting rules that assume a standard upstream Kubernetes distribution. K3s intentionally strips kube-proxy, kube-controller-manager, and kube-scheduler as standalone scrape targets — they are embedded directly into the k3s binary and are not exposed as separate metrics endpoints.
+
+**Fix:** Disabled the corresponding default rule groups in the HelmRelease values:
+```yaml
+defaultRules:
+  rules:
+    kubeProxy: false
+    kubeControllerManager: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+```
+
+
+**Problem: Email alerts not being received despite correct SMTP config**
+
+Gmail SMTP credentials were configured and Alertmanager showed no errors, but no alert emails arrived.
+
+**Root cause:** The default Alertmanager route had `receiver: "null"` at the top level. The `email` receiver existed but was never reached because the routing tree sent everything to null first. The `Watchdog` heartbeat alert (the only alert that always fires) was silenced correctly, but so was everything else.
+
+**Fix:** Set `receiver: email` as the top-level default and scoped the null receiver strictly to the `Watchdog` matcher:
+```yaml
+route:
+  receiver: email
+  routes:
+    - receiver: "null"
+      matchers:
+        - alertname = "Watchdog"
+```
+Alerts are grouped by `namespace` to reduce noise when multiple alerts fire from the same source simultaneously.
+
+**Key Learning:** kube-prometheus-stack is built for upstream Kubernetes. On K3s, the first operational task after deployment is auditing and disabling default rules for the components that are stripped or embedded — they will fire immediately and persistently otherwise. This is not a bug; it is a mismatch between the stack's assumptions and K3s's architecture.
+
+**Resources:**
+- [kube-prometheus-stack Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
+- [Prometheus Alertmanager Configuration](https://prometheus.io/docs/alerting/latest/configuration/)
+- [K3s Architecture — Packaged Components](https://docs.k3s.io/architecture)
