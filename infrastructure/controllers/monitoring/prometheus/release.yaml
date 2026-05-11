@@ -72,6 +72,15 @@ spec:
             - receiver: "null"
               matchers:
                 - alertname = "Watchdog"
+            - receiver: "null"
+              matchers:
+            - alertname = "KubeControllerManagerDown"
+            - receiver: "null"
+              matchers:
+                - alertname = "KubeProxyDown"
+            - receiver: "null"
+              matchers:
+                - alertname = "KubeSchedulerDown"
         receivers:
         - name: "null"
         - name: email
