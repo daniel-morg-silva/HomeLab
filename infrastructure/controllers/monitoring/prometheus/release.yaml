@@ -21,6 +21,12 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    defaultRules:
+      rules:
+        kubeProxy: false
+        kubeControllerManager: false
+        kubeSchedulerAlerting: false
+        kubeSchedulerRecording: false
     # Prometheus configuration
     prometheus:
       prometheusSpec:
@@ -74,15 +80,6 @@ spec:
             - receiver: "null"
               matchers:
                 - alertname = "Watchdog"
-            - receiver: "null"
-              matchers:
-            - alertname = "KubeControllerManagerDown"
-            - receiver: "null"
-              matchers:
-                - alertname = "KubeProxyDown"
-            - receiver: "null"
-              matchers:
-                - alertname = "KubeSchedulerDown"
         receivers:
         - name: "null"
         - name: email
