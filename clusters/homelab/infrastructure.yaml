@@ -11,6 +11,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Aggressive drift detection
+  upgrade:
+    remediation:
+      retries: -1  # Retry indefinitely
+    force: true  # Force resource updates
+    preserveValues: false  # Always use Git values
 
 ---
 
@@ -49,6 +55,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Aggressive drift detection
+  upgrade:
+    remediation:
+      retries: -1  # Retry indefinitely
+    force: true  # Force resource updates
+    preserveValues: false  # Always use Git values
 
 ---
 
@@ -84,6 +96,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Aggressive drift detection
+  upgrade:
+    remediation:
+      retries: -1  # Retry indefinitely
+    force: true  # Force resource updates
+    preserveValues: false  # Always use Git values
 
 ---
 
@@ -140,6 +158,12 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Aggressive drift detection
+  upgrade:
+    remediation:
+      retries: -1  # Retry indefinitely
+    force: true  # Force resource updates
+    preserveValues: false  # Always use Git values
 
 ---
 
@@ -177,3 +201,9 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  # Aggressive drift detection
+  upgrade:
+    remediation:
+      retries: -1  # Retry indefinitely
+    force: true  # Force resource updates
+    preserveValues: false  # Always use Git values
