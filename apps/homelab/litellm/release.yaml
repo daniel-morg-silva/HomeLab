@@ -15,6 +15,9 @@ spec:
         namespace: litellm
       interval: 24h
   values:
+    masterkeySecretName: litellm-secrets
+    masterkeySecretKey: PROXY_MASTER_KEY
+    
     environmentSecrets:
       - litellm-secrets
 
@@ -24,8 +27,6 @@ spec:
           litellm_params:
             model: gemini/gemini-3.6-flash
             api_key: os.environ/GEMINI_API_KEY
-      general_settings:
-        master_key: os.environ/PROXY_MASTER_KEY
 
     db:
       deployStandalone: false
