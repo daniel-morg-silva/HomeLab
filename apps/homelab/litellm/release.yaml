@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: litellm
+  namespace: litellm
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: litellm-helm
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: litellm
+        namespace: litellm
+      interval: 24h
+  values:
+    masterkey: sk-gp+ojwAH+ouhgWo+ihdsfg
+
+    environmentSecrets:
+      - litellm-secrets
+
+    proxy_config:
+      model_list:
+        - model_name: gemini-flash
+          litellm_params:
+            model: gemini/gemini-3.6-flash
+            api_key: os.environ/GEMINI_API_KEY
+      general_settings:
+        master_key: os.environ/PROXY_MASTER_KEY
+
+    db:
+      deployStandalone: false
+      useExisting: false
+
+    migrationJob:
+      enabled: false
+
+    service:
+      type: ClusterIP
+      port: 4000
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
+    nodeSelector:
+      kubernetes.io/hostname: geralt

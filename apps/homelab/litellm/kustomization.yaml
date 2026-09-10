@@ -1,0 +1,5 @@
+resources:
+  - namespace.yaml
+  - secrets.yaml
+  - repository.yaml
+  - release.yaml
