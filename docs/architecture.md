@@ -4,8 +4,8 @@
 
 | Role | Machine | Cluster IP | Home Network IP |
 |------|---------|------------|-----------------|
-| Master / Control Plane | HP ProBook 4520s | `10.0.0.1` (`ens5.10`) | `192.168.87.10` (`ens5.1`) |
-| Worker Node | Asus X555L | `10.0.0.2` (`enp2s0.10`) | `192.168.87.11` (`enp2s0.1`) |
+| Worker Node / Control Plane | HP ProBook 4520s | `10.0.0.1` (`ens5.10`) | `192.168.1.10` (`ens5.1`) |
+| Master | Asus X555L | `10.0.0.2` (`enp2s0.10`) | `192.168.1.11` (`enp2s0.1`) |
 
 K3s was installed with `--disable=traefik` and `--disable=servicelb` to remove the defaults and replace them with MetalLB and the NGINX Inc ingress controller managed via GitOps.
 
