@@ -15,8 +15,6 @@ spec:
         namespace: litellm
       interval: 24h
   values:
-    masterkey: sk-gp+ojwAH+ouhgWo+ihdsfg
-
     environmentSecrets:
       - litellm-secrets
 
@@ -47,5 +45,11 @@ spec:
       limits:
         memory: 1Gi
 
-    nodeSelector:
-      kubernetes.io/hostname: geralt
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
