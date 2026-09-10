@@ -5,5 +5,5 @@ metadata:
   namespace: litellm
 spec:
   interval: 1h
-  url: oci://ghcr.io/berriai/litellm-helm
+  url: oci://ghcr.io/berriai
   type: oci
