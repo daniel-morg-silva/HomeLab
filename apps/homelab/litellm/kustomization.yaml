@@ -1,5 +1,6 @@
 resources:
   - namespace.yaml
+  - db
   - secrets.yaml
   - repository.yaml
   - release.yaml

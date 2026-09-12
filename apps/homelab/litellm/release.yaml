@@ -32,11 +32,16 @@ spec:
             api_key: os.environ/GEMINI_API_KEY
 
     db:
-      deployStandalone: false
-      useExisting: false
+      useExisting: true
+      endpoint: litellm-db-rw
+      database: litellm
+      secret:
+        name: litellm-db-app
+        usernameKey: username
+        passwordKey: password
 
     migrationJob:
-      enabled: false
+      enabled: true
 
     service:
       type: ClusterIP
