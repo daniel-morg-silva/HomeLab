@@ -9,6 +9,7 @@ spec:
     spec:
       template:
         spec:
+          suspend: true
           containers:
           - name: scraper
             image: ghcr.io/mischavandenburg/whoop-scraper:v0.0.5
