@@ -58,5 +58,5 @@ spec:
                 - key: node-role.kubernetes.io/control-plane
                   operator: DoesNotExist
     serviceMonitor:
-      enabled: true
+      enabled: false
       interval: 30s
