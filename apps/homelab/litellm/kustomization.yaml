@@ -3,3 +3,4 @@ resources:
   - secrets.yaml
   - repository.yaml
   - release.yaml
+  - servicemonitor.yaml
