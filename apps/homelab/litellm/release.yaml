@@ -23,6 +23,8 @@ spec:
       - litellm-secrets
 
     proxy_config:
+      general_settings:
+        callbacks: ["prometheus"]
       model_list:
         - model_name: gemini-flash
           litellm_params:
@@ -57,4 +59,4 @@ spec:
                   operator: DoesNotExist
     serviceMonitor:
       enabled: true
-      interval: 15s
+      interval: 30s
