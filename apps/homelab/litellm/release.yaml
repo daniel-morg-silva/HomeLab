@@ -23,6 +23,8 @@ spec:
       - litellm-secrets
 
     proxy_config:
+      litellm_settings:
+        require_auth_for_metrics_endpoint: false
       general_settings:
         callbacks: ["prometheus"]
       model_list:
