@@ -33,6 +33,7 @@ spec:
 
     db:
       useExisting: true
+      deployStandalone: false
       endpoint: litellm-db-rw
       database: litellm
       secret:
